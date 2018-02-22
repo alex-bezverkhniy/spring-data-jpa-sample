@@ -1,17 +1,15 @@
 package com.alexbezverkhniy.samples.springdatajpasample.domain;
 
-import org.springframework.data.annotation.Id;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
  * Created by Alex Bezverkhniy on 2/21/18.
  */
 @Entity
-public class Item extends BaseEntity implements Serializable {
+@Table
+public class Task extends BaseEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,6 +20,18 @@ public class Item extends BaseEntity implements Serializable {
     private String description;
 
     private Boolean isComplete;
+
+    @ManyToOne
+    private TodoList todoList;
+
+    public Task() {
+    }
+
+    public Task(String title, String description, Boolean isComplete) {
+        this.title = title;
+        this.description = description;
+        this.isComplete = isComplete;
+    }
 
     public Long getId() {
         return id;
@@ -53,5 +63,13 @@ public class Item extends BaseEntity implements Serializable {
 
     public void setComplete(Boolean complete) {
         isComplete = complete;
+    }
+
+    public TodoList getTodoList() {
+        return todoList;
+    }
+
+    public void setTodoList(TodoList todoList) {
+        this.todoList = todoList;
     }
 }

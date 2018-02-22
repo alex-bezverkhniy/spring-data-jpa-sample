@@ -1,18 +1,16 @@
 package com.alexbezverkhniy.samples.springdatajpasample.domain;
 
-import org.springframework.data.annotation.Id;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Alex Bezverkhniy on 2/21/18.
  */
 @Entity
+@Table
 public class TodoList extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -20,8 +18,17 @@ public class TodoList extends BaseEntity implements Serializable {
 
     private String title;
 
-    @ManyToOne
-    private List<Item> items;
+    @OneToMany
+    private List<Task> tasks;
+
+    public TodoList() {
+        this.tasks = new ArrayList<>();
+    }
+
+    public TodoList(String title) {
+        this.title = title;
+        this.tasks = new ArrayList<>();
+    }
 
     public Long getId() {
         return id;
@@ -39,11 +46,11 @@ public class TodoList extends BaseEntity implements Serializable {
         this.title = title;
     }
 
-    public List<Item> getItems() {
-        return items;
+    public List<Task> getTasks() {
+        return tasks;
     }
 
-    public void setItems(List<Item> items) {
-        this.items = items;
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
     }
 }
