@@ -1,6 +1,7 @@
 package com.alexbezverkhniy.samples.springdatajpasample.repositories;
 
 import com.alexbezverkhniy.samples.springdatajpasample.domain.Task;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -14,5 +15,5 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends CrudRepository<Task, Long>, PagingAndSortingRepository<Task, Long> {
     List<Task> findByTitle(String title);
-    List<Task> findByTitle(String title, Pageable pageable);
+    Page<Task> findByTitle(String title, Pageable pageable);
 }

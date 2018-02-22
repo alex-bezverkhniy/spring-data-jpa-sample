@@ -9,6 +9,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -189,5 +194,81 @@ public class TodoServiceTest {
 
         assertTrue(actual);
         verify(taskRepository, times(1)).save(task);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void findTaskByTitleShouldThrowIllegalArgumentExceptionTest() {
+        service.findTaskByTitle(null, 0, 0);
+    }
+
+    @Test(expected = TaskNotFoundException.class)
+    public void findTaskByTitleShouldThrowTaskNotFoundExceptionTest() {
+        final String title = "test";
+        final int page = 0;
+        final int size = 5;
+        Task task = new Task();
+        Page<Task> pageResponse = new PageImpl<Task>(Arrays.asList(task));
+
+        when(taskRepository.findByTitle(anyString(), any(PageRequest.class))).thenReturn(null);
+
+        Page<Task> actual = service.findTaskByTitle(title, page, size);
+
+
+        verify(taskRepository, times(1)).findByTitle(anyString(), any(PageRequest.class));
+    }
+
+    @Test
+    public void findTaskByTitleShouldReturnListOfTasksTest() {
+        final String title = "test";
+        final int page = 0;
+        final int size = 5;
+        Task task = new Task();
+        Page<Task> pageResponse = new PageImpl<Task>(Arrays.asList(task));
+
+        when(taskRepository.findByTitle(anyString(), any(PageRequest.class))).thenReturn(pageResponse);
+
+        Page<Task> actual = service.findTaskByTitle(title, page, size);
+
+        assertNotNull(actual);
+
+        verify(taskRepository, times(1)).findByTitle(anyString(), any(PageRequest.class));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void findTodoListByTitleShouldThrowIllegalArgumentExceptionTest() {
+        service.findTodoListByTitle(null, 0, 0);
+    }
+
+    @Test(expected = TodoListNotFoundException.class)
+    public void findTodoListByTitleShouldThrowTodoListNotFoundExceptionTest() {
+        final String title = "test";
+        final int page = 0;
+        final int size = 5;
+        TodoList todoList = new TodoList();
+        Page<TodoList> pageResponse = new PageImpl<TodoList>(Arrays.asList(todoList));
+
+        when(todoListRepository.findByTitle(anyString(), any(PageRequest.class))).thenReturn(null);
+
+        Page<TodoList> actual = service.findTodoListByTitle(title, page, size);
+
+
+        verify(todoListRepository, times(1)).findByTitle(anyString(), any(PageRequest.class));
+    }
+
+    @Test
+    public void findTodoListByTitleShouldReturnListOfTodoListsTest() {
+        final String title = "test";
+        final int page = 0;
+        final int size = 5;
+        TodoList todoList = new TodoList();
+        Page<TodoList> pageResponse = new PageImpl<TodoList>(Arrays.asList(todoList));
+
+        when(todoListRepository.findByTitle(anyString(), any(PageRequest.class))).thenReturn(pageResponse);
+
+        Page<TodoList> actual = service.findTodoListByTitle(title, page, size);
+
+        assertNotNull(actual);
+
+        verify(todoListRepository, times(1)).findByTitle(anyString(), any(PageRequest.class));
     }
 }

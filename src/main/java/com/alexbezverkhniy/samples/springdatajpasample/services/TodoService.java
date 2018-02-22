@@ -5,6 +5,8 @@ import com.alexbezverkhniy.samples.springdatajpasample.domain.TodoList;
 import com.alexbezverkhniy.samples.springdatajpasample.repositories.TaskRepository;
 import com.alexbezverkhniy.samples.springdatajpasample.repositories.TodoListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -137,5 +139,21 @@ public class TodoService {
 
     public void deleteTask(Long todoListId) {
         taskRepository.delete(findTask(todoListId));
+    }
+
+    public Page<Task> findTaskByTitle(String title, int page, int size) {
+        Page<Task> result = taskRepository.findByTitle(title, new PageRequest(page, size));
+        if (result == null) {
+            throw new TaskNotFoundException();
+        }
+        return result;
+    }
+
+    public Page<TodoList> findTodoListByTitle(String title, int page, int size) {
+        Page<TodoList> result = todoListRepository.findByTitle(title, new PageRequest(page, size));
+        if (result == null) {
+            throw new TodoListNotFoundException();
+        }
+        return result;
     }
 }

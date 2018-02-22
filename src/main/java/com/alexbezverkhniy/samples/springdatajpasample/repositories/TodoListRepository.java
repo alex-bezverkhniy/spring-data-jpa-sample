@@ -1,7 +1,7 @@
 package com.alexbezverkhniy.samples.springdatajpasample.repositories;
 
-import com.alexbezverkhniy.samples.springdatajpasample.domain.Task;
 import com.alexbezverkhniy.samples.springdatajpasample.domain.TodoList;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -14,6 +14,6 @@ import java.util.List;
  */
 @Repository
 public interface TodoListRepository extends CrudRepository<TodoList, Long>, PagingAndSortingRepository<TodoList, Long> {
-    List<Task> findByTitle(String title);
-    List<Task> findByTitle(String title, Pageable pageable);
+    List<TodoList> findByTitle(String title);
+    Page<TodoList> findByTitle(String title, Pageable pageable);
 }
