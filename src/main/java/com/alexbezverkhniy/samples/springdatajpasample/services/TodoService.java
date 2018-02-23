@@ -1,5 +1,6 @@
 package com.alexbezverkhniy.samples.springdatajpasample.services;
 
+import com.alexbezverkhniy.samples.springdatajpasample.domain.BaseEntity;
 import com.alexbezverkhniy.samples.springdatajpasample.domain.Task;
 import com.alexbezverkhniy.samples.springdatajpasample.domain.TodoList;
 import com.alexbezverkhniy.samples.springdatajpasample.repositories.TaskRepository;
@@ -8,8 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
+
+import java.util.Date;
+
+import static com.alexbezverkhniy.samples.springdatajpasample.SpringDataJpaSampleApplication.DEFAULT_USER;
 
 /**
  * Created by Alex Bezverkhniy on 2/21/18.
@@ -27,6 +33,8 @@ public class TodoService {
         if (task == null) {
             throw new IllegalArgumentException("Argument \"task\" should NOT be null");
         }
+        updateOrPopulateMetadata(task);
+        task.setComplete(task.getComplete() == null ? false : task.getComplete() );
         return taskRepository.save(task);
     }
 
@@ -34,6 +42,7 @@ public class TodoService {
         if (todoList == null) {
             throw new IllegalArgumentException("Argument \"todoList\" should NOT be null");
         }
+        updateOrPopulateMetadata(todoList);
         return todoListRepository.save(todoList);
     }
 
@@ -151,8 +160,39 @@ public class TodoService {
     public Page<TodoList> findTodoListByTitle(String title, int page, int size) {
         Page<TodoList> result = todoListRepository.findByTitle(title, new PageRequest(page, size));
         if (result == null) {
-            throw new TaskNotFoundException(String.format("Todo list with title: %s is not found", title));
+            throw new TodoListNotFoundException(String.format("Todo list with title: %s is not found", title));
         }
         return result;
+    }
+
+    public Page<TodoList> findAllTodoLists(PageRequest pageRequest) {
+        if (pageRequest == null) {
+            throw new IllegalArgumentException("Argument \"pageRequest\" should NOT be null");
+        }
+        Page<TodoList> result = todoListRepository.findAll(pageRequest);
+        if (result == null) {
+            throw new TodoListNotFoundException();
+        }
+        return result;
+    }
+
+    public Page<Task> findAllTasks(PageRequest pageRequest) {
+        if (pageRequest == null) {
+            throw new IllegalArgumentException("Argument \"pageRequest\" should NOT be null");
+        }
+        Page<Task> result = taskRepository.findAll(pageRequest);
+
+        if (result == null) {
+            throw new TaskNotFoundException();
+        }
+
+        return result;
+    }
+
+    protected void updateOrPopulateMetadata(BaseEntity entity) {
+        entity.setCreatedAt(entity.getCreatedAt() == null ? new Date() : entity.getCreatedAt());
+        entity.setCreatedBy(StringUtils.isEmpty(entity.getCreatedBy()) ? DEFAULT_USER : entity.getCreatedBy());
+        entity.setUpdatedAt(new Date());
+        entity.setUpdatedBy(StringUtils.isEmpty(entity.getUpdatedBy()) ? DEFAULT_USER : entity.getUpdatedBy());
     }
 }

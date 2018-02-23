@@ -14,9 +14,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Arrays;
+import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -54,6 +54,28 @@ public class TodoServiceTest {
 
         verify(taskRepository, times(1)).save(task);
         assertNotNull(actual.getId());
+        assertNotNull(actual.getCreatedAt());
+        assertNotNull(actual.getCreatedBy());
+        assertNotNull(actual.getUpdatedAt());
+        assertNotNull(actual.getUpdatedBy());
+        assertFalse(actual.getComplete());
+    }
+
+    @Test
+    public void saveTaskShouldSUpdateDateTest() {
+        final Task task = new Task();
+        Date oldDate = new Date();
+        task.setUpdatedAt(oldDate);
+        when(taskRepository.save(task)).then(invocation -> {
+            task.setId(1l);
+            return task;
+        });
+
+        Task actual = service.saveTask(task);
+
+        verify(taskRepository, times(1)).save(task);
+        assertNotNull(actual.getUpdatedAt());
+        assertNotEquals(oldDate, actual.getUpdatedAt());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -73,6 +95,10 @@ public class TodoServiceTest {
 
         verify(todoListRepository, times(1)).save(todoList);
         assertNotNull(actual.getId());
+        assertNotNull(actual.getCreatedAt());
+        assertNotNull(actual.getCreatedBy());
+        assertNotNull(actual.getUpdatedAt());
+        assertNotNull(actual.getUpdatedBy());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -270,5 +296,65 @@ public class TodoServiceTest {
         assertNotNull(actual);
 
         verify(todoListRepository, times(1)).findByTitle(anyString(), any(PageRequest.class));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void findAllTodoListsShouldThrowIllegalArgumentExceptionTest() {
+        service.findAllTodoLists(null);
+    }
+
+    @Test(expected = TodoListNotFoundException.class)
+    public void findAllTodoListsShouldThrowTodoListNotFoundExceptionTest() {
+        final PageRequest pageRequest = new PageRequest(0,5);
+
+        when(todoListRepository.findAll(pageRequest)).thenReturn(null);
+
+        service.findAllTodoLists(pageRequest);
+
+        verify(todoListRepository, times(1)).findAll(pageRequest);
+    }
+
+    @Test
+    public void findAllTodoListsTest() {
+        final PageRequest pageRequest = new PageRequest(0,5);
+
+        when(todoListRepository.findAll(pageRequest)).thenReturn(new PageImpl<TodoList>(Arrays.asList(new TodoList())));
+
+        Page<TodoList> result = service.findAllTodoLists(pageRequest);
+
+        assertNotNull(result);
+        assertTrue(result.hasContent());
+        assertTrue(result.getContent().size() == 1);
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void findAllTasksShouldThrowIllegalArgumentExceptionTest() {
+        service.findAllTasks(null);
+    }
+
+    @Test(expected = TaskNotFoundException.class)
+    public void findAllTasksShouldThrowTaskNotFoundExceptionTest() {
+        final PageRequest pageRequest = new PageRequest(0,5);
+
+        when(taskRepository.findAll(pageRequest)).thenReturn(null);
+
+        service.findAllTasks(pageRequest);
+
+        verify(taskRepository, times(1)).findAll(pageRequest);
+    }
+
+    @Test
+    public void findAllTasksTest() {
+        final PageRequest pageRequest = new PageRequest(0,5);
+
+        when(taskRepository.findAll(pageRequest)).thenReturn(new PageImpl<Task>(Arrays.asList(new Task())));
+
+        Page<Task> result = service.findAllTasks(pageRequest);
+
+        assertNotNull(result);
+        assertTrue(result.hasContent());
+        assertTrue(result.getContent().size() == 1);
+
     }
 }
