@@ -88,7 +88,7 @@ public class TodoService {
 
         TodoList todoList = todoListRepository.findOne(todoListId);
         if (todoList == null) {
-            throw new TodoListNotFoundException();
+            throw new TodoListNotFoundException(todoListId);
         }
 
         return todoList;
@@ -110,9 +110,8 @@ public class TodoService {
 
         Task task = taskRepository.findOne(taskId);
         if (task == null) {
-            throw new TaskNotFoundException();
+            throw new TaskNotFoundException(taskId);
         }
-
 
         return task;
     }
@@ -144,7 +143,7 @@ public class TodoService {
     public Page<Task> findTaskByTitle(String title, int page, int size) {
         Page<Task> result = taskRepository.findByTitle(title, new PageRequest(page, size));
         if (result == null) {
-            throw new TaskNotFoundException();
+            throw new TaskNotFoundException(String.format("Task with title: %s is not found", title));
         }
         return result;
     }
@@ -152,7 +151,7 @@ public class TodoService {
     public Page<TodoList> findTodoListByTitle(String title, int page, int size) {
         Page<TodoList> result = todoListRepository.findByTitle(title, new PageRequest(page, size));
         if (result == null) {
-            throw new TodoListNotFoundException();
+            throw new TaskNotFoundException(String.format("Todo list with title: %s is not found", title));
         }
         return result;
     }
