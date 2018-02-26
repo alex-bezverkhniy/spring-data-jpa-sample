@@ -37,7 +37,7 @@ public class TodoController {
     public TodoList updateTodo(@PathVariable("todoListId") Long todoListId, @RequestBody TodoList todoList) {
         service.findTodoList(todoListId);
         todoList.setId(todoListId);
-        return service.saveTodoList(todoList);
+        return service.saveTodoList(todoList, true);
     }
 
     @GetMapping("/tasks/")
@@ -59,6 +59,6 @@ public class TodoController {
     public Task updateTask(@PathVariable("taskId") Long taskId, @RequestBody Task task) {
         service.findTask(taskId);
         task.setId(taskId);
-        return service.saveTask(task);
+        return service.saveTask(task, true);
     }
 }

@@ -30,18 +30,50 @@ public class TodoService {
     protected TodoListRepository todoListRepository;
 
     public Task saveTask(Task task) {
+        return saveTask(task, false);
+    }
+
+    public Task saveTask(Task task, boolean update) {
         if (task == null) {
             throw new IllegalArgumentException("Argument \"task\" should NOT be null");
         }
+
+        if (update) {
+            Task oldTask = findTask(task);
+            // Map only changed values
+            task.setTitle(StringUtils.isEmpty(task.getTitle()) ? oldTask.getTitle() : task.getTitle());
+            task.setDescription(StringUtils.isEmpty(task.getDescription()) ? oldTask.getDescription() : task.getDescription());
+            task.setComplete(task.getComplete() == null ? oldTask.getComplete() : task.getComplete());
+            task.setTodoList(task.getTodoList() == null ? oldTask.getTodoList() : task.getTodoList());
+            task.setCreatedAt(task.getCreatedAt() == null ? oldTask.getCreatedAt() : task.getCreatedAt());
+            task.setCreatedBy(StringUtils.isEmpty(task.getCreatedBy()) ? oldTask.getCreatedBy() : task.getCreatedBy());
+            task.setUpdatedBy(StringUtils.isEmpty(task.getUpdatedBy()) ? oldTask.getUpdatedBy() : task.getUpdatedBy());
+        }
+
         updateOrPopulateMetadata(task);
         task.setComplete(task.getComplete() == null ? false : task.getComplete() );
         return taskRepository.save(task);
     }
 
     public TodoList saveTodoList(TodoList todoList) {
+        return saveTodoList(todoList, false);
+    }
+
+    public TodoList saveTodoList(TodoList todoList, boolean update) {
         if (todoList == null) {
             throw new IllegalArgumentException("Argument \"todoList\" should NOT be null");
         }
+
+        if (update) {
+            TodoList oldTodoList = findTodoList(todoList);
+            // Map only changed values
+            todoList.setTitle(StringUtils.isEmpty(todoList.getTitle()) ? oldTodoList.getTitle() : todoList.getTitle());
+            todoList.setTasks(todoList.getTasks() == null ? oldTodoList.getTasks() : todoList.getTasks());
+            todoList.setCreatedAt(todoList.getCreatedAt() == null ? oldTodoList.getCreatedAt() : todoList.getCreatedAt());
+            todoList.setCreatedBy(StringUtils.isEmpty(todoList.getCreatedBy()) ? oldTodoList.getCreatedBy() : todoList.getCreatedBy());
+            todoList.setUpdatedBy(StringUtils.isEmpty(todoList.getUpdatedBy()) ? oldTodoList.getUpdatedBy() : todoList.getUpdatedBy());
+        }
+
         updateOrPopulateMetadata(todoList);
         return todoListRepository.save(todoList);
     }

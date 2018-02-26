@@ -6,12 +6,17 @@ import com.alexbezverkhniy.samples.springdatajpasample.repositories.TaskReposito
 import com.alexbezverkhniy.samples.springdatajpasample.repositories.TodoListRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.transaction.Transactional;
 
+import java.util.Date;
+
+import static junit.framework.Assert.assertNotSame;
+import static junit.framework.Assert.assertSame;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
@@ -79,5 +84,37 @@ public class TodoServiceIntegTest {
         assertTrue(actual.getTasks().contains(task));
     }
 
-    //TODO test update methods
+    @Test
+    @Transactional
+    public void updateShouldChangeDateTest() {
+        TodoList todoList = service.saveTodoList(new TodoList());
+        TodoList oldTodoList = new TodoList();
+        BeanUtils.copyProperties(todoList, oldTodoList);
+
+        Task task = service.saveTask(new Task("task #1", "simple task #1", false));
+        Task oldTask = new Task();
+        BeanUtils.copyProperties(task, oldTask);
+
+        todoList.setTitle("new title");
+        TodoList actualTodoList = service.saveTodoList(todoList, true);
+
+        assertNotNull(actualTodoList);
+        assertNotSame(oldTodoList.getUpdatedAt(), actualTodoList.getUpdatedAt());
+        assertSame(oldTodoList.getUpdatedBy(), actualTodoList.getUpdatedBy());
+        assertSame(oldTodoList.getCreatedAt(), actualTodoList.getCreatedAt());
+        assertSame(oldTodoList.getCreatedBy(), actualTodoList.getCreatedBy());
+
+        task.setTitle("new title");
+        task.setComplete(true);
+        Task actualTask = service.saveTask(task, true);
+
+        assertNotNull(actualTask);
+        assertNotSame(oldTask.getUpdatedAt(), actualTask.getUpdatedAt());
+        assertNotSame(oldTask.getTitle(), actualTask.getTitle());
+        assertNotSame(oldTask.getComplete(), actualTask.getComplete());
+        assertSame(oldTask.getUpdatedBy(), actualTask.getUpdatedBy());
+        assertSame(oldTask.getCreatedAt(), actualTask.getCreatedAt());
+        assertSame(oldTask.getCreatedBy(), actualTask.getCreatedBy());
+    }
+
 }
