@@ -1,6 +1,8 @@
 
 # Task requests
 
+See more details here - https://alex-bezverkhniy.github.io/Spring-Data-JPA-Sample-app/
+
 ## Create Task
 *Task data:*
 ```json
